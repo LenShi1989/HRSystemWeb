@@ -9,7 +9,7 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { requiresAuth: false }
+      meta: { requiresAuth: false },
     },
     {
       path: '/',
@@ -18,60 +18,54 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/dashboard'
+          redirect: '/dashboard',
         },
         {
           path: 'dashboard',
           name: 'Dashboard',
           component: () => import('@/views/DashboardView.vue'),
-          meta: { title: '儀表板', icon: 'Odometer' }
+          meta: { title: '儀表板', icon: 'Odometer' },
         },
         {
           path: 'employees',
           name: 'Employees',
           component: () => import('@/views/EmployeesView.vue'),
-          meta: { title: '員工管理', icon: 'User' }
+          meta: { title: '員工管理', icon: 'User' },
         },
-        // {
-        //   path: 'employees/:id',
-        //   name: 'EmployeeDetail',
-        //   component: () => import('@/views/EmployeeDetailView.vue'),
-        //   meta: { title: '員工詳情' }
-        // },
-        // {
-        //   path: 'departments',
-        //   name: 'Departments',
-        //   component: () => import('@/views/DepartmentsView.vue'),
-        //   meta: { title: '部門管理', icon: 'OfficeBuilding' }
-        // },
-        // {
-        //   path: 'positions',
-        //   name: 'Positions',
-        //   component: () => import('@/views/PositionsView.vue'),
-        //   meta: { title: '職位管理', icon: 'Briefcase' }
-        // },
-        // {
-        //   path: 'attendance',
-        //   name: 'Attendance',
-        //   component: () => import('@/views/AttendanceView.vue'),
-        //   meta: { title: '考勤管理', icon: 'Calendar' }
-        // },
+        {
+          path: 'employees/:id',
+          name: 'EmployeeDetail',
+          component: () => import('@/views/EmployeeDetailView.vue'),
+          meta: { title: '員工詳情' },
+        },
+        {
+          path: 'departments',
+          name: 'Departments',
+          component: () => import('@/views/DepartmentsView.vue'),
+          meta: { title: '部門管理', icon: 'OfficeBuilding' },
+        },
+        {
+          path: 'attendance',
+          name: 'Attendance',
+          component: () => import('@/views/AttendanceView.vue'),
+          meta: { title: '考勤管理', icon: 'Calendar' },
+        },
         {
           path: 'leave',
           name: 'Leave',
           component: () => import('@/views/LeaveView.vue'),
-          meta: { title: '請假管理', icon: 'Tickets' }
+          meta: { title: '請假管理', icon: 'Tickets' },
         },
         {
           path: 'payroll',
           name: 'Payroll',
           component: () => import('@/views/PayrollView.vue'),
-          meta: { title: '薪資管理', icon: 'Money' }
+          meta: { title: '薪資管理', icon: 'Money' },
         },
-      ]
+      ],
     },
-    { path: '/:pathMatch(.*)*', redirect: '/' }
-  ]
+    { path: '/:pathMatch(.*)*', redirect: '/' },
+  ],
 })
 
 router.beforeEach((to, _from, next) => {

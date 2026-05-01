@@ -1,12 +1,9 @@
 <template>
   <el-container class="main-layout">
-    <!-- Sidebar -->
     <el-aside :width="sidebarWidth" class="sidebar">
       <div class="logo" :class="{ collapsed: appStore.sidebarCollapsed }">
         <el-icon size="28" color="#60a5fa"><OfficeBuilding /></el-icon>
-        <span v-if="!appStore.sidebarCollapsed" class="logo-text"
-          >人事管理系統</span
-        >
+        <span v-if="!appStore.sidebarCollapsed" class="logo-text">人資管理系統</span>
       </div>
 
       <el-menu
@@ -38,24 +35,18 @@
       </div>
     </el-aside>
 
-    <!-- Main Area -->
     <el-container class="main-area">
-      <!-- Header -->
       <el-header class="header">
         <div class="header-left">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/dashboard' }"
-              >首頁</el-breadcrumb-item
-            >
+            <el-breadcrumb-item :to="{ path: '/dashboard' }">首頁</el-breadcrumb-item>
             <el-breadcrumb-item v-if="currentRoute?.meta?.title">
               {{ currentRoute.meta.title }}
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="header-right">
-          <el-tag type="success" size="small">{{
-            authStore.isAdmin ? "管理員" : authStore.isHR ? "HR" : "一般用戶"
-          }}</el-tag>
+          <el-tag type="success" size="small">{{ roleLabel }}</el-tag>
           <el-dropdown @command="handleCommand">
             <div class="user-info">
               <el-avatar size="small" style="background: #3b82f6">
@@ -80,7 +71,6 @@
         </div>
       </el-header>
 
-      <!-- Content -->
       <el-main class="content">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
@@ -93,48 +83,50 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { useAppStore } from "@/stores/app";
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useAppStore } from '@/stores/app'
 import {
-  Odometer,
-  User,
-  OfficeBuilding,
-  Tickets,
-  Calendar,
-  Money,
   ArrowDown,
-  SwitchButton,
+  Calendar,
   Expand,
   Fold,
-} from "@element-plus/icons-vue";
+  Money,
+  Odometer,
+  OfficeBuilding,
+  SwitchButton,
+  Tickets,
+  User,
+} from '@element-plus/icons-vue'
 
-const route = useRoute();
-const router = useRouter();
-const authStore = useAuthStore();
-const appStore = useAppStore();
+const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
+const appStore = useAppStore()
 
 const sidebarWidth = computed(() =>
-  appStore.sidebarCollapsed ? "64px" : "220px",
-);
-const activeMenu = computed(() => "/" + route.path.split("/")[1]);
-const currentRoute = computed(() => route);
+  appStore.sidebarCollapsed ? '64px' : '220px',
+)
+const activeMenu = computed(() => '/' + route.path.split('/')[1])
+const currentRoute = computed(() => route)
+const roleLabel = computed(() =>
+  authStore.isAdmin ? '管理員' : authStore.isHR ? 'HR' : '一般使用者',
+)
 
 const menuItems = [
-  { path: "/dashboard", title: "儀表板", icon: "Odometer" },
-  { path: "/employees", title: "員工管理", icon: "User" },
-  { path: "/departments", title: "部門管理", icon: "OfficeBuilding" },
-  { path: "/positions", title: "職位管理", icon: "Operation" },
-  { path: "/attendance", title: "考勤管理", icon: "Calendar" },
-  { path: "/leave", title: "請假管理", icon: "Tickets" },
-  { path: "/payroll", title: "薪資管理", icon: "Money" },
-];
+  { path: '/dashboard', title: '儀表板', icon: 'Odometer' },
+  { path: '/employees', title: '員工管理', icon: 'User' },
+  { path: '/departments', title: '部門管理', icon: 'OfficeBuilding' },
+  { path: '/attendance', title: '考勤管理', icon: 'Calendar' },
+  { path: '/leave', title: '請假管理', icon: 'Tickets' },
+  { path: '/payroll', title: '薪資管理', icon: 'Money' },
+]
 
 function handleCommand(cmd: string) {
-  if (cmd === "logout") {
-    authStore.logout();
-    router.push("/login");
+  if (cmd === 'logout') {
+    authStore.logout()
+    router.push('/login')
   }
 }
 </script>
