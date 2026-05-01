@@ -1,0 +1,81 @@
+/* src/assets/main.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Element Plus dark theme overrides */
+:root {
+  --el-color-primary: #3b82f6;
+  --el-bg-color: #1e293b;
+  --el-bg-color-overlay: #1e293b;
+  --el-text-color-primary: #f1f5f9;
+  --el-text-color-regular: #94a3b8;
+  --el-border-color: #334155;
+  --el-fill-color-blank: #0f172a;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Element Plus component overrides */
+.el-select-dropdown {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+.el-select-dropdown__item {
+  color: #94a3b8 !important;
+}
+.el-select-dropdown__item.selected {
+  color: #60a5fa !important;
+}
+.el-select-dropdown__item:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.el-date-picker {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+.el-date-picker__header {
+  color: #f1f5f9 !important;
+}
+
+.el-message-box {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+.el-message-box__title {
+  color: #f1f5f9 !important;
+}
+.el-message-box__content {
+  color: #94a3b8 !important;
+}
+
+.el-popper.is-dark {
+  background: #1e293b !important;
+}
