@@ -35,6 +35,7 @@
               <el-descriptions-item label="姓名">{{ employee.fullName }}</el-descriptions-item>
               <el-descriptions-item label="性別">{{ genderLabel(employee.gender) }}</el-descriptions-item>
               <el-descriptions-item label="生日">{{ employee.birthDate || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="身分證號">{{ employee.idCardNo || '-' }}</el-descriptions-item>
               <el-descriptions-item label="Email">{{ employee.email }}</el-descriptions-item>
               <el-descriptions-item label="電話">{{ employee.phone || '-' }}</el-descriptions-item>
               <el-descriptions-item label="地址">{{ employee.address || '-' }}</el-descriptions-item>
@@ -53,6 +54,9 @@
               <el-descriptions-item label="離職日">{{ employee.resignDate || '-' }}</el-descriptions-item>
               <el-descriptions-item label="雇用類型">{{ employmentTypeLabel(employee.employmentType) }}</el-descriptions-item>
               <el-descriptions-item label="基本薪資">{{ formatCurrency(employee.baseSalary) }}</el-descriptions-item>
+              <el-descriptions-item label="銀行帳號">{{ employee.bankAccount || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="建立時間">{{ formatDateTime(employee.createdAt) }}</el-descriptions-item>
+              <el-descriptions-item label="更新時間">{{ formatDateTime(employee.updatedAt) }}</el-descriptions-item>
             </el-descriptions>
           </div>
         </el-col>
@@ -97,17 +101,21 @@ function formatCurrency(value: number) {
   return `NT$ ${Number(value || 0).toLocaleString()}`
 }
 
-function genderLabel(value: number) {
+function genderLabel(value?: number) {
   return value === 1 ? '男' : value === 2 ? '女' : '未設定'
 }
 
-function employmentTypeLabel(value: number) {
+function employmentTypeLabel(value?: number) {
   const labels: Record<number, string> = {
     1: '正職',
     2: '約聘',
     3: '兼職',
   }
   return labels[value] || '未設定'
+}
+
+function formatDateTime(value?: string) {
+  return value ? value.replace('T', ' ').slice(0, 16) : '-'
 }
 
 function statusLabel(value: number) {

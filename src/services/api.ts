@@ -39,31 +39,34 @@ export interface PagedResult<T> {
 export interface Employee {
   id: number
   employeeNo: string
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   fullName: string
-  gender: number
-  birthDate?: string
+  gender?: number
+  birthDate?: string | null
+  idCardNo?: string | null
   email: string
   phone?: string
   address?: string
   photo?: string
-  departmentId: number
+  departmentId?: number
   departmentName: string
-  positionId: number
+  positionId?: number
   positionTitle: string
   managerId?: number
   managerName?: string
   hireDate: string
-  resignDate?: string
-  employmentType: number
+  resignDate?: string | null
+  employmentType?: number
   status: number
-  statusLabel: string
+  statusLabel?: string
   baseSalary: number
-  bankAccount?: string
+  bankAccount?: string | null
   emergencyName?: string
   emergencyPhone?: string
   remarks?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Department {
@@ -139,6 +142,17 @@ export interface Payroll {
   remarks?: string
 }
 
+export interface UserAccount {
+  id: number
+  username: string
+  employeeId?: number | null
+  employeeName?: string | null
+  role: number
+  isActive: boolean
+  lastLoginAt?: string | null
+  createdAt?: string
+}
+
 // ── API Functions ─────────────────────────────────────────────
 
 // Auth
@@ -195,6 +209,15 @@ export const payrollApi = {
     api.get<PagedResult<Payroll>>('/payrolls', { params }),
   create: (data: unknown) => api.post('/payrolls', data),
   markPaid: (id: number) => api.patch(`/payrolls/${id}/pay`, {}),
+}
+
+// Users
+export const userApi = {
+  getAll: () => api.get<UserAccount[]>('/users'),
+  create: (data: unknown) => api.post('/users', data),
+  update: (id: number, data: unknown) => api.put(`/users/${id}`, data),
+  resetPassword: (id: number, data: unknown) =>
+    api.patch(`/users/${id}/password`, data),
 }
 
 export default api

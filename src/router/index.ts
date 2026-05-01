@@ -62,6 +62,12 @@ const router = createRouter({
           component: () => import('@/views/PayrollView.vue'),
           meta: { title: '薪資管理', icon: 'Money' },
         },
+        {
+          path: 'users',
+          name: 'Users',
+          component: () => import('@/views/UsersView.vue'),
+          meta: { title: '帳號管理', icon: 'Setting', requiresAdmin: true },
+        },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
@@ -70,11 +76,18 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const auth = useAuthStore()
+
   if (to.meta.requiresAuth !== false && !auth.isLoggedIn) {
     next('/login')
-  } else {
-    next()
+    return
   }
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    next('/dashboard')
+    return
+  }
+
+  next()
 })
 
 export default router

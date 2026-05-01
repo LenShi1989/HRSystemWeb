@@ -12,7 +12,7 @@
         <el-table-column prop="managerName" label="主管" width="140">
           <template #default="{ row }">{{ row.managerName || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="employeeCount" label="員工數" width="100" />
+        <el-table-column prop="employeeCount" label="在職人數" width="100" />
         <el-table-column prop="description" label="描述" min-width="220">
           <template #default="{ row }">{{ row.description || '-' }}</template>
         </el-table-column>
@@ -25,20 +25,20 @@
         </el-table-column>
         <el-table-column label="操作" width="110" fixed="right">
           <template #default="{ row }">
-            <el-button text size="small" type="primary" @click="openDialog(row)">
-              編輯
-            </el-button>
+            <el-button text size="small" type="primary" @click="openDialog(row)">編輯</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
-    <el-dialog
-      v-model="dialogVisible"
-      :title="editMode ? '編輯部門' : '新增部門'"
-      width="560px"
-      destroy-on-close
-    >
+    <el-dialog v-model="dialogVisible" :title="editMode ? '編輯部門' : '新增部門'" width="560px" destroy-on-close>
+      <el-alert
+        v-if="editMode"
+        title="目前後端部門更新 API 只接受名稱、代碼、描述與主管；啟用狀態會依資料表顯示，但此表單不送出狀態異動。"
+        type="info"
+        :closable="false"
+        class="form-note"
+      />
       <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="部門代碼" prop="code">
           <el-input v-model="form.code" placeholder="例如 HR" />
@@ -47,27 +47,9 @@
           <el-input v-model="form.name" placeholder="例如 人力資源部" />
         </el-form-item>
         <el-form-item label="主管">
-          <el-select
-            v-model="form.managerId"
-            clearable
-            filterable
-            placeholder="選擇主管"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="employee in employees"
-              :key="employee.id"
-              :label="employee.fullName"
-              :value="employee.id"
-            />
+          <el-select v-model="form.managerId" clearable filterable placeholder="選擇主管" style="width: 100%">
+            <el-option v-for="employee in employees" :key="employee.id" :label="employee.fullName" :value="employee.id" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="狀態">
-          <el-switch
-            v-model="form.isActive"
-            active-text="啟用"
-            inactive-text="停用"
-          />
         </el-form-item>
         <el-form-item label="描述">
           <el-input v-model="form.description" type="textarea" :rows="3" />
@@ -75,9 +57,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">
-          儲存
-        </el-button>
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">儲存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -105,7 +85,6 @@ const form = reactive({
   name: '',
   description: '',
   managerId: undefined as number | undefined,
-  isActive: true,
 })
 
 const rules: FormRules = {
@@ -133,7 +112,6 @@ function openDialog(department?: Department) {
     name: department?.name || '',
     description: department?.description || '',
     managerId: department?.managerId,
-    isActive: department?.isActive ?? true,
   })
   dialogVisible.value = true
 }
@@ -170,54 +148,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.page-title {
-  color: #f1f5f9;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-.table-card {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 20px;
-}
-:deep(.el-table) {
-  background: transparent !important;
-  color: #94a3b8;
-}
-:deep(.el-table tr) {
-  background: transparent !important;
-}
-:deep(.el-table th.el-table__cell) {
-  background: #0f172a !important;
-  color: #64748b;
-  border-bottom: 1px solid #334155;
-}
-:deep(.el-table td.el-table__cell) {
-  border-bottom-color: #334155;
-}
-:deep(.el-table--enable-row-hover .el-table__body tr:hover > td) {
-  background: rgba(59, 130, 246, 0.05) !important;
-}
-:deep(.el-dialog) {
-  background: #1e293b;
-  border: 1px solid #334155;
-}
-:deep(.el-dialog__title),
-:deep(.el-form-item__label) {
-  color: #f1f5f9;
-}
-:deep(.el-input__wrapper),
-:deep(.el-textarea__inner) {
-  background: #0f172a;
-  border-color: #334155;
-  color: #f1f5f9;
-}
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.page-title { color: #f1f5f9; font-size: 20px; font-weight: 600; margin: 0; }
+.table-card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+.form-note { margin-bottom: 16px; }
+:deep(.el-table) { background: transparent !important; color: #94a3b8; }
+:deep(.el-table tr) { background: transparent !important; }
+:deep(.el-table th.el-table__cell) { background: #0f172a !important; color: #64748b; border-bottom: 1px solid #334155; }
+:deep(.el-table td.el-table__cell) { border-bottom-color: #334155; }
+:deep(.el-table--enable-row-hover .el-table__body tr:hover > td) { background: rgba(59, 130, 246, 0.05) !important; }
+:deep(.el-dialog) { background: #1e293b; border: 1px solid #334155; }
+:deep(.el-dialog__title), :deep(.el-form-item__label) { color: #f1f5f9; }
+:deep(.el-input__wrapper), :deep(.el-textarea__inner) { background: #0f172a; border-color: #334155; color: #f1f5f9; }
 </style>

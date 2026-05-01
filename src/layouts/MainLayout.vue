@@ -15,11 +15,7 @@
         active-text-color="#60a5fa"
         class="sidebar-menu"
       >
-        <el-menu-item
-          v-for="item in menuItems"
-          :key="item.path"
-          :index="item.path"
-        >
+        <el-menu-item v-for="item in visibleMenuItems" :key="item.path" :index="item.path">
           <el-icon><component :is="item.icon" /></el-icon>
           <template #title>{{ item.title }}</template>
         </el-menu-item>
@@ -50,13 +46,9 @@
           <el-dropdown @command="handleCommand">
             <div class="user-info">
               <el-avatar size="small" style="background: #3b82f6">
-                {{
-                  authStore.empName?.charAt(0) || authStore.username?.charAt(0)
-                }}
+                {{ authStore.empName?.charAt(0) || authStore.username?.charAt(0) }}
               </el-avatar>
-              <span class="user-name">{{
-                authStore.empName || authStore.username
-              }}</span>
+              <span class="user-name">{{ authStore.empName || authStore.username }}</span>
               <el-icon><ArrowDown /></el-icon>
             </div>
             <template #dropdown>
@@ -95,6 +87,7 @@ import {
   Money,
   Odometer,
   OfficeBuilding,
+  Setting,
   SwitchButton,
   Tickets,
   User,
@@ -121,7 +114,12 @@ const menuItems = [
   { path: '/attendance', title: '考勤管理', icon: 'Calendar' },
   { path: '/leave', title: '請假管理', icon: 'Tickets' },
   { path: '/payroll', title: '薪資管理', icon: 'Money' },
+  { path: '/users', title: '帳號管理', icon: 'Setting', adminOnly: true },
 ]
+
+const visibleMenuItems = computed(() =>
+  menuItems.filter(item => !item.adminOnly || authStore.isAdmin),
+)
 
 function handleCommand(cmd: string) {
   if (cmd === 'logout') {
@@ -160,6 +158,7 @@ function handleCommand(cmd: string) {
 .logo.collapsed {
   justify-content: center;
 }
+
 .logo-text {
   color: #f1f5f9;
   font-size: 15px;
@@ -170,10 +169,12 @@ function handleCommand(cmd: string) {
   border: none;
   flex: 1;
 }
+
 :deep(.el-menu-item) {
   border-radius: 8px;
   margin: 2px 8px;
 }
+
 :deep(.el-menu-item.is-active) {
   background: rgba(96, 165, 250, 0.15) !important;
 }
@@ -206,6 +207,7 @@ function handleCommand(cmd: string) {
   cursor: pointer;
   color: #94a3b8;
 }
+
 .user-name {
   font-size: 14px;
 }
@@ -223,6 +225,7 @@ function handleCommand(cmd: string) {
 :deep(.el-breadcrumb__inner) {
   color: #64748b !important;
 }
+
 :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
   color: #94a3b8 !important;
 }
@@ -231,6 +234,7 @@ function handleCommand(cmd: string) {
 .fade-leave-active {
   transition: opacity 0.2s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

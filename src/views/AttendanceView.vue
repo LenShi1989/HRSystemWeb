@@ -6,49 +6,11 @@
     </div>
 
     <div class="filter-bar">
-      <el-select
-        v-model="query.employeeId"
-        clearable
-        filterable
-        placeholder="員工"
-        style="width: 180px"
-        @change="fetchData"
-      >
-        <el-option
-          v-for="employee in employees"
-          :key="employee.id"
-          :label="employee.fullName"
-          :value="employee.id"
-        />
+      <el-select v-model="query.employeeId" clearable filterable placeholder="員工" style="width: 180px" @change="fetchData">
+        <el-option v-for="employee in employees" :key="employee.id" :label="employee.fullName" :value="employee.id" />
       </el-select>
-      <el-date-picker
-        v-model="query.startDate"
-        type="date"
-        value-format="YYYY-MM-DD"
-        placeholder="開始日期"
-        style="width: 150px"
-        @change="fetchData"
-      />
-      <el-date-picker
-        v-model="query.endDate"
-        type="date"
-        value-format="YYYY-MM-DD"
-        placeholder="結束日期"
-        style="width: 150px"
-        @change="fetchData"
-      />
-      <el-select
-        v-model="query.status"
-        clearable
-        placeholder="狀態"
-        style="width: 130px"
-        @change="fetchData"
-      >
-        <el-option label="正常" :value="1" />
-        <el-option label="遲到" :value="2" />
-        <el-option label="早退" :value="3" />
-        <el-option label="缺勤" :value="4" />
-      </el-select>
+      <el-date-picker v-model="query.startDate" type="date" value-format="YYYY-MM-DD" placeholder="開始日期" style="width: 150px" @change="fetchData" />
+      <el-date-picker v-model="query.endDate" type="date" value-format="YYYY-MM-DD" placeholder="結束日期" style="width: 150px" @change="fetchData" />
     </div>
 
     <div class="table-card">
@@ -56,10 +18,10 @@
         <el-table-column prop="employeeName" label="員工" width="140" />
         <el-table-column prop="attendDate" label="日期" width="120" />
         <el-table-column prop="checkIn" label="上班時間" width="120">
-          <template #default="{ row }">{{ row.checkIn || '-' }}</template>
+          <template #default="{ row }">{{ formatTime(row.checkIn) }}</template>
         </el-table-column>
         <el-table-column prop="checkOut" label="下班時間" width="120">
-          <template #default="{ row }">{{ row.checkOut || '-' }}</template>
+          <template #default="{ row }">{{ formatTime(row.checkOut) }}</template>
         </el-table-column>
         <el-table-column prop="workHours" label="工時" width="90">
           <template #default="{ row }">{{ row.workHours ?? '-' }}</template>
@@ -76,9 +38,7 @@
         </el-table-column>
         <el-table-column label="操作" width="110" fixed="right">
           <template #default="{ row }">
-            <el-button text size="small" type="primary" @click="openDialog(row)">
-              編輯
-            </el-button>
+            <el-button text size="small" type="primary" @click="openDialog(row)">編輯</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -94,69 +54,25 @@
       />
     </div>
 
-    <el-dialog
-      v-model="dialogVisible"
-      :title="editMode ? '編輯考勤' : '新增考勤'"
-      width="560px"
-      destroy-on-close
-    >
+    <el-dialog v-model="dialogVisible" :title="editMode ? '編輯考勤' : '新增考勤'" width="560px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="員工" prop="employeeId">
-          <el-select
-            v-model="form.employeeId"
-            filterable
-            placeholder="選擇員工"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="employee in employees"
-              :key="employee.id"
-              :label="employee.fullName"
-              :value="employee.id"
-            />
+          <el-select v-model="form.employeeId" filterable placeholder="選擇員工" style="width: 100%">
+            <el-option v-for="employee in employees" :key="employee.id" :label="employee.fullName" :value="employee.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="日期" prop="attendDate">
-          <el-date-picker
-            v-model="form.attendDate"
-            type="date"
-            value-format="YYYY-MM-DD"
-            style="width: 100%"
-          />
+          <el-date-picker v-model="form.attendDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
         </el-form-item>
         <el-form-item label="上班時間">
-          <el-time-picker
-            v-model="form.checkIn"
-            value-format="HH:mm:ss"
-            format="HH:mm"
-            placeholder="選擇時間"
-            style="width: 100%"
-          />
+          <el-time-picker v-model="form.checkIn" value-format="HH:mm:ss" format="HH:mm" placeholder="選擇時間" style="width: 100%" />
         </el-form-item>
         <el-form-item label="下班時間">
-          <el-time-picker
-            v-model="form.checkOut"
-            value-format="HH:mm:ss"
-            format="HH:mm"
-            placeholder="選擇時間"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="工時">
-          <el-input-number
-            v-model="form.workHours"
-            :min="0"
-            :max="24"
-            :step="0.5"
-            style="width: 100%"
-          />
+          <el-time-picker v-model="form.checkOut" value-format="HH:mm:ss" format="HH:mm" placeholder="選擇時間" style="width: 100%" />
         </el-form-item>
         <el-form-item label="狀態" prop="status">
           <el-select v-model="form.status" style="width: 100%">
-            <el-option label="正常" :value="1" />
-            <el-option label="遲到" :value="2" />
-            <el-option label="早退" :value="3" />
-            <el-option label="缺勤" :value="4" />
+            <el-option v-for="option in attendanceStatuses" :key="option.value" :label="option.label" :value="option.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="備註">
@@ -165,9 +81,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">
-          儲存
-        </el-button>
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">儲存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -194,7 +108,6 @@ const query = reactive({
   employeeId: undefined as number | undefined,
   startDate: '',
   endDate: '',
-  status: undefined as number | undefined,
   page: 1,
   pageSize: 20,
 })
@@ -204,10 +117,19 @@ const form = reactive({
   attendDate: '',
   checkIn: '',
   checkOut: '',
-  workHours: undefined as number | undefined,
   status: 1,
   remarks: '',
 })
+
+const attendanceStatuses = [
+  { label: '正常', value: 1 },
+  { label: '遲到', value: 2 },
+  { label: '早退', value: 3 },
+  { label: '缺勤', value: 4 },
+  { label: '公假', value: 5 },
+  { label: '事假', value: 6 },
+  { label: '病假', value: 7 },
+]
 
 const rules: FormRules = {
   employeeId: [{ required: true, message: '請選擇員工', trigger: 'change' }],
@@ -216,13 +138,7 @@ const rules: FormRules = {
 }
 
 function statusLabel(value: number) {
-  const labels: Record<number, string> = {
-    1: '正常',
-    2: '遲到',
-    3: '早退',
-    4: '缺勤',
-  }
-  return labels[value] || '未知'
+  return attendanceStatuses.find(item => item.value === value)?.label || '未知'
 }
 
 function statusType(value: number) {
@@ -231,8 +147,15 @@ function statusType(value: number) {
     2: 'warning',
     3: 'warning',
     4: 'danger',
+    5: 'info',
+    6: 'info',
+    7: 'info',
   }
   return types[value] || 'info'
+}
+
+function formatTime(value?: string) {
+  return value ? value.slice(0, 5) : '-'
 }
 
 async function fetchData() {
@@ -255,7 +178,6 @@ function openDialog(attendance?: Attendance) {
     attendDate: attendance?.attendDate || '',
     checkIn: attendance?.checkIn || '',
     checkOut: attendance?.checkOut || '',
-    workHours: attendance?.workHours,
     status: attendance?.status ?? 1,
     remarks: attendance?.remarks || '',
   })
@@ -289,60 +211,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.page-title {
-  color: #f1f5f9;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.table-card {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 20px;
-}
-:deep(.el-table) {
-  background: transparent !important;
-  color: #94a3b8;
-}
-:deep(.el-table tr) {
-  background: transparent !important;
-}
-:deep(.el-table th.el-table__cell) {
-  background: #0f172a !important;
-  color: #64748b;
-  border-bottom: 1px solid #334155;
-}
-:deep(.el-table td.el-table__cell) {
-  border-bottom-color: #334155;
-}
-:deep(.el-table--enable-row-hover .el-table__body tr:hover > td) {
-  background: rgba(59, 130, 246, 0.05) !important;
-}
-:deep(.el-dialog) {
-  background: #1e293b;
-  border: 1px solid #334155;
-}
-:deep(.el-dialog__title),
-:deep(.el-form-item__label) {
-  color: #f1f5f9;
-}
-:deep(.el-input__wrapper),
-:deep(.el-textarea__inner) {
-  background: #0f172a;
-  border-color: #334155;
-  color: #f1f5f9;
-}
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.page-title { color: #f1f5f9; font-size: 20px; font-weight: 600; margin: 0; }
+.filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.table-card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+:deep(.el-table) { background: transparent !important; color: #94a3b8; }
+:deep(.el-table tr) { background: transparent !important; }
+:deep(.el-table th.el-table__cell) { background: #0f172a !important; color: #64748b; border-bottom: 1px solid #334155; }
+:deep(.el-table td.el-table__cell) { border-bottom-color: #334155; }
+:deep(.el-table--enable-row-hover .el-table__body tr:hover > td) { background: rgba(59, 130, 246, 0.05) !important; }
+:deep(.el-dialog) { background: #1e293b; border: 1px solid #334155; }
+:deep(.el-dialog__title), :deep(.el-form-item__label) { color: #f1f5f9; }
+:deep(.el-input__wrapper), :deep(.el-textarea__inner) { background: #0f172a; border-color: #334155; color: #f1f5f9; }
 </style>
