@@ -1,6 +1,16 @@
 <template>
-  <el-container class="main-layout">
-    <el-aside :width="sidebarWidth" class="sidebar">
+  <el-container class="main-layout" :class="{ mobile: isMobile }">
+    <div
+      v-if="isMobile && !appStore.sidebarCollapsed"
+      class="sidebar-backdrop"
+      @click="appStore.toggleSidebar()"
+    />
+
+    <el-aside
+      :width="sidebarWidth"
+      class="sidebar"
+      :class="{ open: !appStore.sidebarCollapsed }"
+    >
       <div class="logo" :class="{ collapsed: appStore.sidebarCollapsed }">
         <el-icon size="28" color="#60a5fa"><OfficeBuilding /></el-icon>
         <span v-if="!appStore.sidebarCollapsed" class="logo-text">人資管理系統</span>
@@ -14,6 +24,7 @@
         text-color="#94a3b8"
         active-text-color="#60a5fa"
         class="sidebar-menu"
+        @select="handleMenuSelect"
       >
         <el-menu-item v-for="item in visibleMenuItems" :key="item.path" :index="item.path">
           <el-icon><component :is="item.icon" /></el-icon>
@@ -21,19 +32,17 @@
         </el-menu-item>
       </el-menu>
 
-      <div class="sidebar-footer">
-        <el-button
-          :icon="appStore.sidebarCollapsed ? 'Expand' : 'Fold'"
-          text
-          style="color: #64748b; width: 100%"
-          @click="appStore.toggleSidebar()"
-        />
-      </div>
     </el-aside>
 
     <el-container class="main-area">
       <el-header class="header">
         <div class="header-left">
+          <el-button
+            :icon="appStore.sidebarCollapsed ? 'Expand' : 'Fold'"
+            text
+            class="sidebar-toggle"
+            @click="appStore.toggleSidebar()"
+          />
           <el-breadcrumb separator="/">
             <el-breadcrumb-item :to="{ path: '/dashboard' }">首頁</el-breadcrumb-item>
             <el-breadcrumb-item v-if="currentRoute?.meta?.title">
@@ -75,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
@@ -97,9 +106,10 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const isMobile = ref(false)
 
 const sidebarWidth = computed(() =>
-  appStore.sidebarCollapsed ? '64px' : '220px',
+  isMobile.value ? '260px' : appStore.sidebarCollapsed ? '64px' : '220px',
 )
 const activeMenu = computed(() => '/' + route.path.split('/')[1])
 const currentRoute = computed(() => route)
@@ -121,18 +131,42 @@ const visibleMenuItems = computed(() =>
   menuItems.filter(item => !item.adminOnly || authStore.isAdmin),
 )
 
+function syncMobileLayout() {
+  const mobile = window.innerWidth <= 768
+  isMobile.value = mobile
+  if (mobile) {
+    appStore.sidebarCollapsed = true
+  }
+}
+
+function handleMenuSelect() {
+  if (isMobile.value && !appStore.sidebarCollapsed) {
+    appStore.sidebarCollapsed = true
+  }
+}
+
 function handleCommand(cmd: string) {
   if (cmd === 'logout') {
     authStore.logout()
     router.push('/login')
   }
 }
+
+onMounted(() => {
+  syncMobileLayout()
+  window.addEventListener('resize', syncMobileLayout)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', syncMobileLayout)
+})
 </script>
 
 <style scoped>
 .main-layout {
   height: 100vh;
   background: #0f172a;
+  position: relative;
 }
 
 .sidebar {
@@ -142,6 +176,14 @@ function handleCommand(cmd: string) {
   flex-direction: column;
   transition: width 0.3s ease;
   overflow: hidden;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.64);
+  backdrop-filter: blur(2px);
 }
 
 .logo {
@@ -179,11 +221,6 @@ function handleCommand(cmd: string) {
   background: rgba(96, 165, 250, 0.15) !important;
 }
 
-.sidebar-footer {
-  padding: 12px;
-  border-top: 1px solid #334155;
-}
-
 .header {
   background: #1e293b;
   border-bottom: 1px solid #334155;
@@ -192,6 +229,24 @@ function handleCommand(cmd: string) {
   justify-content: space-between;
   padding: 0 24px;
   height: 64px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-toggle {
+  color: #94a3b8;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
 }
 
 .header-right {
@@ -220,6 +275,49 @@ function handleCommand(cmd: string) {
 
 .main-area {
   overflow: hidden;
+}
+
+.mobile .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 90;
+  width: 260px !important;
+  transform: translateX(-100%);
+  box-shadow: 16px 0 32px rgba(2, 6, 23, 0.32);
+}
+
+.mobile .sidebar.open {
+  transform: translateX(0);
+}
+
+.mobile .main-area {
+  width: 100%;
+}
+
+.mobile .header {
+  padding: 0 12px;
+}
+
+.mobile .header-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile .header-right {
+  gap: 8px;
+}
+
+.mobile .user-name,
+.mobile :deep(.el-breadcrumb__item:first-child) {
+  display: none;
+}
+
+.mobile .content {
+  padding: 16px 12px;
+}
+
+.mobile :deep(.el-breadcrumb) {
+  min-width: 0;
 }
 
 :deep(.el-breadcrumb__inner) {

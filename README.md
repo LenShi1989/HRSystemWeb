@@ -71,16 +71,32 @@ npm run dev
 http://localhost:5173
 ```
 
-API base URL 預設為：
+開發模式會透過 Vite proxy 將 `/api` 轉到後端：
 
 ```text
-http://localhost:5000/api
+http://localhost:5000
 ```
 
-可透過 `.env` 設定：
+環境變數檔案必須放在專案根目錄，不是 `src/` 目錄。
+
+`.env.development` 範例：
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_APP_URL=http://localhost:5173
+VITE_BASE_PATH=/
+VITE_DEV_HOST=localhost
+VITE_DEV_PORT=5173
+VITE_API_URL=/api
+VITE_API_PROXY_TARGET=http://localhost:5000
+```
+
+`.env.production` 範例：
+
+```env
+VITE_APP_URL=http://192.168.10.6:8080
+VITE_BASE_PATH=/
+VITE_API_URL=http://192.168.10.6:5000/api
+VITE_API_PROXY_TARGET=http://192.168.10.6:5000
 ```
 
 ## 後端啟動

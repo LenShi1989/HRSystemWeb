@@ -79,3 +79,53 @@ body,
 .el-popper.is-dark {
   background: #1e293b !important;
 }
+
+@media (max-width: 768px) {
+  .page-header {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-header .el-button {
+    width: 100%;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    gap: 10px !important;
+  }
+
+  .filter-bar > *,
+  .filter-bar .el-input,
+  .filter-bar .el-select,
+  .filter-bar .el-date-editor {
+    width: 100% !important;
+  }
+
+  .table-card {
+    padding: 12px !important;
+    overflow-x: auto;
+  }
+
+  .el-dialog {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px);
+  }
+
+  .el-dialog__body {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+
+  .el-col {
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .el-pagination {
+    flex-wrap: wrap;
+    justify-content: flex-start !important;
+    gap: 8px;
+  }
+}
